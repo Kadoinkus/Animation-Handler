@@ -8,6 +8,7 @@ import { resolve } from 'path';
  */
 export default defineConfig({
   plugins: [react()],
+  base: './', // This makes all asset paths relative,
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
