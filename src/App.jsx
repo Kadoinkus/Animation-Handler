@@ -114,8 +114,10 @@ export default function App(){
 
   /* === render ==================================================== */
   return (
-    <>
+    <div style={{ padding: '20px' }}>
       <h2>Animation Handler</h2>
+
+      <FileDropZone onFileUpload={setCsv} />
 
       <input type="file" accept=".csv,.txt"
              onChange={e=>e.target.files[0]?.text().then(setCsv)}/>
@@ -155,6 +157,58 @@ export default function App(){
       )}
 
       <div className="log">{log.map((l,i)=><div key={i}>{l}</div>)}</div>
-    </>
+    </div>
   );
 }
+
+/* === File Drop Zone Component ==================================== */
+const FileDropZone = ({ onFileUpload }) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type === "text/csv" || file.name.endsWith('.csv')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          onFileUpload(event.target.result);
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Please drop a CSV file");
+      }
+    }
+  };
+
+  return (
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        border: `2px dashed ${isDragging ? '#4a9eff' : '#ccc'}`,
+        borderRadius: '4px',
+        padding: '20px',
+        textAlign: 'center',
+        backgroundColor: isDragging ? 'rgba(74, 158, 255, 0.1)' : 'transparent',
+        transition: 'all 0.2s ease',
+        marginBottom: '20px'
+      }}
+    >
+      {isDragging ? 'Drop CSV file here' : 'Drag and drop a CSV file here'}
+    </div>
+  );
+};
